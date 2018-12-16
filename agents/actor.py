@@ -30,11 +30,8 @@ class Actor:
         # Add hidden layers
         net = layers.Dense(units=32, activation='relu')(states)
         net = layers.BatchNormalization()(net)
-        net = layers.Dropout(0.1)(net)
         net = layers.Dense(units=64, activation='relu')(net)
         net = layers.BatchNormalization()(net)
-        net = layers.Dropout(0.1)(net)
-        net = layers.Dense(units=32, activation='relu')(net)
 
         # Add final output layer with sigmoid activation
         raw_actions = layers.Dense(units=self.action_size, activation='sigmoid',
@@ -50,8 +47,6 @@ class Actor:
         # Define loss function using action value (Q value) gradients
         action_gradients = layers.Input(shape=(self.action_size,))
         loss = K.mean(-action_gradients * actions)
-
-        # Incorporate any additional losses here (e.g. from regularizers)
 
         # Define optimizer and training function
         optimizer = optimizers.Adam()

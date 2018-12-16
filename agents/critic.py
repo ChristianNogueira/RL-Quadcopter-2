@@ -26,19 +26,15 @@ class Critic:
         # Add hidden layer(s) for state pathway
         net_states = layers.Dense(units=32, activation='relu')(states)
         net_states = layers.BatchNormalization()(net_states)
-        net_states = layers.Dropout(0.1)(net_states)
         net_states = layers.Dense(units=64, activation='relu')(net_states)
         net_states = layers.BatchNormalization()(net_states)
-        net_states = layers.Dropout(0.1)(net_states)
         net_states = layers.Dense(units=64, activation='relu')(net_states)
 
         # Add hidden layer(s) for action pathway
         net_actions = layers.Dense(units=32, activation='relu')(actions)
         net_actions = layers.BatchNormalization()(net_actions)
-        net_actions = layers.Dropout(0.1)(net_actions)
         net_actions = layers.Dense(units=64, activation='relu')(net_actions)
         net_actions = layers.BatchNormalization()(net_actions)
-        net_actions = layers.Dropout(0.1)(net_actions)
         net_actions = layers.Dense(units=64, activation='relu')(net_actions)
 
         # Combine state and action pathways
@@ -46,17 +42,17 @@ class Critic:
         net = layers.Activation('relu')(net)
 
         # Add final output layer to prduce action values (Q values)
-        Q_values = layers.Dense(units=1, name='q_values')(net)
+        q_values = layers.Dense(units=1, name='q_values')(net)
 
         # Create Keras model
-        self.model = models.Model(inputs=[states, actions], outputs=Q_values)
+        self.model = models.Model(inputs=[states, actions], outputs=q_values)
 
         # Define optimizer and compile model for training with built-in loss function
         optimizer = optimizers.Adam()
         self.model.compile(optimizer=optimizer, loss='mse')
 
         # Compute action gradients (derivative of Q values w.r.t. to actions)
-        action_gradients = K.gradients(Q_values, actions)
+        action_gradients = K.gradients(q_values, actions)
 
         # Define an additional function to fetch action gradients (to be used by actor model)
         self.get_action_gradients = K.function(

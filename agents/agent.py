@@ -1,8 +1,8 @@
 import numpy as np
 from agents.actor import Actor
 from agents.critic import Critic
-from agents.replaybuffer import ReplayBuffer
 from agents.ounoise import OUNoise
+from agents.replaybuffer import ReplayBuffer
 
 
 class DDPG:
@@ -28,39 +28,32 @@ class DDPG:
         self.actor_target.model.set_weights(self.actor_local.model.get_weights())
 
         # Noise process
-        self.exploration_mu = 0
-        self.exploration_theta = 0.15
-        self.exploration_sigma = 0.2
+        self.exploration_mu = 0.1
+        self.exploration_theta = 0.1
+        self.exploration_sigma = 0.1
         self.noise = OUNoise(self.action_size, self.exploration_mu, self.exploration_theta, self.exploration_sigma)
 
         # Replay memory
         self.buffer_size = 100000
-        self.batch_size = 64
+        self.batch_size = 128
         self.memory = ReplayBuffer(self.buffer_size, self.batch_size)
 
         # Algorithm parameters
         self.gamma = 0.99  # discount factor
-        self.tau = 0.001  # for soft update of target parameters
+        self.tau = 0.01  # for soft update of target parameters
 
-        # Score tracker
+        # trackers
         self.score = 0.0
-        self.best_score = -np.inf
-        self.count = 0
 
     def reset_episode(self):
-        self.count = 0
         self.score = 0.0
-
         self.noise.reset()
         state = self.task.reset()
         self.last_state = state
         return state
 
     def step(self, action, reward, next_state, done):
-        self.count += 1
         self.score += reward
-        if self.score > self.best_score:
-            self.best_score = self.score
 
         # Save experience / reward
         self.memory.add(self.last_state, action, reward, next_state, done)
