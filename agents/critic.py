@@ -24,18 +24,26 @@ class Critic:
         actions = layers.Input(shape=(self.action_size,), name='actions')
 
         # Add hidden layer(s) for state pathway
-        net_states = layers.Dense(units=32, activation='relu')(states)
+        net_states = layers.Dense(units=16, activation='relu')(states)
         net_states = layers.BatchNormalization()(net_states)
-        net_states = layers.Dense(units=64, activation='relu')(net_states)
+        net_states = layers.Dropout(0.4)(net_states)
+        net_states = layers.Dense(units=32, activation='relu')(net_states)
         net_states = layers.BatchNormalization()(net_states)
-        net_states = layers.Dense(units=64, activation='relu')(net_states)
+        net_states = layers.Dropout(0.4)(net_states)
+        net_states = layers.Dense(units=16, activation='relu')(net_states)
+        net_states = layers.BatchNormalization()(net_states)
+        net_states = layers.Dropout(0.4)(net_states)
 
         # Add hidden layer(s) for action pathway
-        net_actions = layers.Dense(units=32, activation='relu')(actions)
+        net_actions = layers.Dense(units=16, activation='relu')(actions)
         net_actions = layers.BatchNormalization()(net_actions)
-        net_actions = layers.Dense(units=64, activation='relu')(net_actions)
+        net_actions = layers.Dropout(0.4)(net_actions)
+        net_actions = layers.Dense(units=32, activation='relu')(net_actions)
         net_actions = layers.BatchNormalization()(net_actions)
-        net_actions = layers.Dense(units=64, activation='relu')(net_actions)
+        net_actions = layers.Dropout(0.4)(net_actions)
+        net_actions = layers.Dense(units=16, activation='relu')(net_actions)
+        net_actions = layers.BatchNormalization()(net_actions)
+        net_actions = layers.Dropout(0.4)(net_actions)
 
         # Combine state and action pathways
         net = layers.Add()([net_states, net_actions])

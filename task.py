@@ -22,7 +22,7 @@ class Task:
 
         self.state_size = self.action_repeat * 6
         self.action_low = 200
-        self.action_high = 700
+        self.action_high = 900
         self.action_size = 4
 
         # Goal
@@ -30,18 +30,26 @@ class Task:
 
     def get_reward(self):
         """Uses current pose of sim to return reward."""
+        reward = 0
 
         # https://stackoverflow.com/questions/1401712/how-can-the-euclidean-distance-be-calculated-with-numpy
-        distance = np.linalg.norm(self.sim.pose[:3] - self.target_pos)
+        dist_target = np.linalg.norm(self.sim.pose[:3] - self.target_pos)
 
-        if distance < 15:
-            reward = min(1., 5. / (distance + 1))
-        elif distance < 10:
-            reward = min(1., 10. / (distance + 1))
-        elif distance < 5:
-            reward = min(1., 15. / (distance + 1))
+        # z
+        reward += self.sim.pose[2] * 4
+        # x
+        reward -= abs(self.sim.pose[0]) / 2.
+        # y
+        reward -= abs(self.sim.pose[1]) / 2.
+
+        if dist_target < 15:
+            reward += 1 / (dist_target + 0.1) ** 2
         else:
-            reward = 0
+            reward -= dist_target ** 2
+
+        # clip reward
+        if abs(reward) > 10:
+            reward = 10
 
         return reward
 
