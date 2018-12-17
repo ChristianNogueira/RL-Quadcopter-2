@@ -33,23 +33,21 @@ class Task:
         reward = 0
 
         # https://stackoverflow.com/questions/1401712/how-can-the-euclidean-distance-be-calculated-with-numpy
-        dist_target = np.linalg.norm(self.sim.pose[:3] - self.target_pos)
+        # dist_target = np.linalg.norm(self.sim.pose[:3] - self.target_pos)
 
-        # z
-        reward += self.sim.pose[2] * 4
-        # x
+        # Take off reward (added 10% to z positing to stable to the hight
+        if self.sim.pose[2] < (self.target_pos[2] * 1.1):
+            reward += self.sim.pose[2] * 4
+        else:
+            # gradually give less reward for being to high
+            reward = (self.target_pos[2] - self.sim.pose[2]) / 2
+
+        # stable XY plane
         reward -= abs(self.sim.pose[0]) / 2.
-        # y
         reward -= abs(self.sim.pose[1]) / 2.
 
-        if dist_target < 15:
-            reward += 1 / (dist_target + 0.1) ** 2
-        else:
-            reward -= dist_target ** 2
-
-        # clip reward
-        if abs(reward) > 10:
-            reward = 10
+        # clip reward with activation function
+        reward = np.tanh(reward)
 
         return reward
 
